@@ -10,6 +10,12 @@
 
 dune_common_options_am2cmake()
 {
+    space=" "
+    tab="	"
+    # $SPACE will unfortunately not work since grep will not accept an
+    # embedded newline.  Instead one can often get away with using $BLANK
+    BLANK="$space$tab"
+
     # CMake Packages are case sensitive
     # This is a list of packages whose names converted
     # to lower case are used for configures
@@ -39,14 +45,14 @@ dune_common_options_am2cmake()
     fi
 
     # Check for --with-minimal-debug-level
-    local arg=`echo "$PARAMS"| sed "s/.*--with-minimal-debug-level=\(\S*\).*/\1/"`
-    if test "x$arg" != "x$PARAMS"; then
+    local arg=`echo "$PARAMS"| grep \\\\-\\\\-with-minimal-debug-level | sed "s/.*--with-minimal-debug-level=\([^[$BLANK]]*\).*/\1/"`
+    if test "x$arg" != "x"; then
         CMAKE_PARAMS="$CMAKE_PARAMS -DMINIMAL_DEBUG_LEVEL:String=$arg"
     fi
 
     #Check for --prefix
-    local arg=`echo "$PARAMS"| sed "s/.*--prefix=\(\S*\).*/\1/"`
-    if test "x$arg" != "x$PARAMS"; then
-        CMAKE_PARAMS="$CMAKE_PARAMS -DCMAKE_INSTALL_PREFIX=$arg"
+    local arg=`echo "$PARAMS"| grep \\\\-\\\\-prefix | sed "s/.*--prefix=\([^[$BLANK]]*\).*/\1/"`
+    if test "x$arg" != "x"; then
+        CMAKE_PARAMS="$CMAKE_PARAMS -DCMAKE_INSTALL_PREFIX:PATH=$arg"
     fi
 }

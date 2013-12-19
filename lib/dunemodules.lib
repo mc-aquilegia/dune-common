@@ -600,7 +600,7 @@ default_am2cmake_options(){
             continue
         fi
         # process --with-$lowercase=<arg>
-        local arg=`echo $PARAMS| sed "s/.*--with-$lowercase=\(\S*\).*/\1/"`
+        local arg=`echo $PARAMS| sed "s/.*--with-$lowercase=\([^[$BLANK]]*\).*/\1/"`
         local arg=`eval echo $arg` # expand tilde to prevent problems
         if test "x$arg" = "xno"; then
             CMAKE_PARAMS="$CMAKE_PARAMS -DCMAKE_DISABLE_FIND_PACKAGE_$package=TRUE"
@@ -629,9 +629,10 @@ default_am2cmake_libraries(){
 	    continue
 	fi
 	export "$lowercase"-lib_processed=1
-	term="s/.*--with-""$lowercase""-lib=\(\S*\).*/\1/"
-        arg=`echo "$PARAMS" | sed "$term"`
-	if test "x$arg" != "x" && test "x$PARAMS" != "x$arg"; then
+	term="s/.*--with-""$lowercase""-lib=\([^[$BLANK]]*\).*/\1/"
+        grepterm="\\-\\-$lowercase""-lib"
+	arg=`echo "$PARAMS" | grep $grepterm | sed "$term"`
+	if test "x$arg" != "x"; then
 	    CMAKE_PARAMS="$CMAKE_PARAMS -D$uppercase""_LIBRARY=$arg"
 	fi
     done
