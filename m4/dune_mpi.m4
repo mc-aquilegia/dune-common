@@ -109,15 +109,20 @@ AC_DEFUN([DUNE_MPI],[
   AC_ARG_ENABLE(mpiruntest,
     AS_HELP_STRING([--disable-mpiruntest],
       [Don\'t try to run a MPI program during configure. (This is needed if you depend on a queuing system)]))
-
+  # allow users to deactivate detection of MPI implementation
+  AC_ARG_ENABLE(mpiconfigtest, 
+    AS_HELP_STRING([--disable-mpiconfigtest],
+      [Don\'t try to detect MPI implementation during configure. (This is needed for using unknown MPI implementations)]))
   with_mpi="no"
 
   ## do nothing if --disable-parallel is used
   AS_IF([test "x$enable_parallel" = "xyes"],[
     ACX_MPI([
       MPICOMP="$MPICC"
-
-      MPI_CONFIG()
+      AS_IF([test "x$mpiconfigtest" != "yes"],[
+        AC_MSG_WARN([Disabled test whether running with $dune_MPI_VERSION works.])
+	dune_MPI_VERSION="unknown"], [
+      	MPI_CONFIG()])
       DUNEMPICPPFLAGS="$DUNEMPICPPFLAGS $MPI_NOCXXFLAGS -DENABLE_MPI=1"
 
       with_mpi="yes ($dune_MPI_VERSION)"
